@@ -1,9 +1,24 @@
-import logo from './logo.svg';
 import './App.css';
 import React, { useState, useEffect } from 'react';
+import ArrayFromFile from './Array';
 
 
-const WORDS = ["apple", "grape", "peach", "plumb", "mango", "berry", "melon", "lemon", "guava", "olive"];
+// const WORDS = words.split('\n');
+// const WORDS = ["apple", "grape", "peach", "plumb", "mango", "berry", "melon", "lemon", "guava", "olive"];r
+
+// function getArrayFromFile(filePath) {
+//   try {
+//     const data = fs.readFileSync(filePath, 'utf8');
+//     return data.split('\n').map(word => word.trim()).filter(word => word.length > 0);
+//   } catch (err) {
+//     console.error('Error reading file:', err);
+//     return [];
+//   }
+// }
+
+
+const WORDS = ArrayFromFile();
+
 
 function getRandomWord() {
   return WORDS[Math.floor(Math.random() * WORDS.length)];
@@ -18,6 +33,8 @@ const App = () => {
   const [message, setMessage] = useState('');
   const [attemptsLeft, setAttemptsLeft] = useState(6);
   const [gameOver, setGameOver] = useState(false);
+  const [feedback, setFeedback] = useState([]);
+
 
   const handleChange = (e) => {
     setGuess(e.target.value);
@@ -29,6 +46,12 @@ const App = () => {
       setGameOver(true);
     }
   }, [attemptsLeft, gameOver, word]);
+
+  const newFeedback = guess.split('').map((char, idx) => {
+    if (char === word[idx]) return 'correct';
+    if (word.includes(char)) return 'present';
+    return 'absent';
+  });
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -42,6 +65,7 @@ const App = () => {
     }
     setAttempts([...attempts, guess]);
     setAttemptsLeft(attemptsLeft - 1);
+    setFeedback([...feedback, newFeedback]);
 
     if (guess === word) {
       setMessage('Congratulations! You guessed the word!');
@@ -52,27 +76,30 @@ const App = () => {
     setGuess('');
   };
 
-  const renderAttempts = () => {
-    return attempts.map((attempt, index) => (
-      <div key={index}>
-        {attempt.split('').map((char, i) => {
-          let className = '';
-          if (char === word[i]) {
-            className = 'correct';
-          } else if (word.includes(char)) {
-            className = 'present';
-          } else {
-            className = 'absent';
-          }
-            return (
-            <span key={i} className={className}>
-              {char} ({className})
-            </span>
-            );
-        })}
-      </div>
-    ));
-  };
+
+
+  // const renderAttempts = () => {
+  //   return attempts.map((attempt, index) => (
+  //     <div key={index}>
+  //       {attempt.split('').map((char, i) => {
+  //         let className = '';
+  //         if (char === word[i]) {
+  //           className = 'correct';
+  //         } else if (word.includes(char)) {
+  //           className = 'present';
+  //         } else {
+  //           className = 'absent';
+  //         }
+  //           return (
+  //           <span key={i} className={className}>
+  //             {char} ({className})
+  //           </span>
+  //           );
+  //       })}
+  //     </div>
+  //   ));
+  // };
+
 
   const restartGame = () => {
     setWord(getRandomWord());
@@ -100,21 +127,26 @@ const App = () => {
           {/* <button type="submit">Submit</button> */}
         </form>
         <div>{message}</div>
-        <div>{renderAttempts()}</div>
-
-        <table>
-          <tbody>
-            {Array.from({ length: 6 }).map((_, rowIndex) => (
-              <tr key={rowIndex}>
-                {Array.from({ length: 5 }).map((_, colIndex) => (
-                  <td key={colIndex} className="cell">
-                    {attempts[rowIndex] && attempts[rowIndex][colIndex]}
-                  </td>
-                ))}
-              </tr>
+        {/* <div>{renderAttempts()}</div> */}
+        <div>
+          <h2>Words List</h2>
+          <ul>
+            {WORDS.map((word, index) => (
+              <li key={index}>{word}</li>
             ))}
-          </tbody>
-        </table>
+          </ul>
+        </div>
+
+        {attempts.map((guess, idx) => (
+        <div key={idx} className="guess">
+          {guess.split('').map((char, charIdx) => (
+            <span key={charIdx} className={`tile ${feedback[idx][charIdx]}`}>
+              {char.toUpperCase()}
+            </span>
+          ))}
+        </div>
+      ))}
+
 
         <button onClick={restartGame}>
           Restart Game

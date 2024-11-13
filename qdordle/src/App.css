@@ -49,4 +49,34 @@ input {
   display: inline-block;
   vertical-align: middle;
 }
+.guess {
+  display: flex;
+  justify-content: center;
+  margin: 5px 0;
+}
 
+.tile {
+  width: 30px;
+  height: 30px;
+  margin: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.tile.correct {
+  background-color: green;
+  color: white;
+}
+
+.tile.present {
+  background-color: orange;
+  color: white;
+}
+
+.tile.absent {
+  background-color: lightgray;
+  color: black;
+}
